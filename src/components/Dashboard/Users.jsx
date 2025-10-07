@@ -53,7 +53,7 @@ const Users = () => {
         onCloseDelete()
     }
 
-    const updateOption = () => async () => {
+    const updateOption = async () => {
         const optionToUpdate = {
             ...optionSelected,
             is_active: optionSelected.is_active == 1 ? true : false,
@@ -167,26 +167,26 @@ const Users = () => {
                     <Table variant='simple' size={'lg'}>
                         <Thead>
                             <Tr bgColor={'gray.200'} >
-                                <Th isNumeric>ID</Th>
-                                <Th>Nombre</Th>
-                                <Th>Email</Th>
-                                <Th>Rol</Th>
-                                <Th>Activo</Th>
-                                <Th>Anónimo</Th>
-                                <Th>Acciones</Th>
+                                <Th textAlign={'center'} isNumeric>ID</Th>
+                                <Th textAlign={'center'}>Nombre</Th>
+                                <Th textAlign={'center'}>Email</Th>
+                                <Th textAlign={'center'}>Rol</Th>
+                                <Th textAlign={'center'}>Activo</Th>
+                                <Th textAlign={'center'}>Anónimo</Th>
+                                <Th textAlign={'center'}>Acciones</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
                             {
                                 data.map((user, i) => (
                                     <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={user?.id}>
-                                        <Td isNumeric>{user?.id}</Td>
-                                        <Td>{user?.name}</Td>
-                                        <Td>{user?.email}</Td>
-                                        <Td>{user?.role.toUpperCase()}</Td>
-                                        <Td>{user?.is_active == 1 ? 'Sí' : 'No'}</Td>
-                                        <Td>{user?.is_anonymous == 1 ? 'Sí' : 'No'}</Td>
-                                        <Td>
+                                        <Td textAlign={'center'} isNumeric>{user?.id}</Td>
+                                        <Td textAlign={'center'}>{user?.name}</Td>
+                                        <Td textAlign={'center'}>{user?.email}</Td>
+                                        <Td textAlign={'center'}>{user?.role.toUpperCase()}</Td>
+                                        <Td textAlign={'center'}>{user?.is_active == 1 ? 'Sí' : 'No'}</Td>
+                                        <Td textAlign={'center'}>{user?.is_anonymous == 1 ? 'Sí' : 'No'}</Td>
+                                        <Td textAlign={'center'}>
                                             <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
                                                 <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(user)} />
                                                 <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(user) }} />
@@ -274,7 +274,7 @@ const Users = () => {
                         <Button variant='outline' mr={3} onClick={cleanOption}>
                             Cerrar
                         </Button>
-                        <Button variant='solid' onClick={updateOption()}>Actualizar</Button>
+                        <Button variant='solid' onClick={updateOption}>Actualizar</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

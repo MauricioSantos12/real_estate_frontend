@@ -20,8 +20,6 @@ export const AuthProvider = ({ children }) => {
         body: { email, password },
       });
       if (res) {
-        console.log("response from login", res)
-        console.log({ res })
         setUser(res.user ? res.user : null);
         setToken(res.token || null);
         localStorage.setItem("token", JSON.stringify(res.token));

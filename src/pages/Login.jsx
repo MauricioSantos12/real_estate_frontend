@@ -11,7 +11,6 @@ const Login = () => {
     const handleLogin = async () => {
         try {
             const data = await login(email, password);
-            console.log({ data })
             if (data) {
                 showToast({
                     title: "Login Successful",

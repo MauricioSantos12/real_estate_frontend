@@ -30,11 +30,10 @@ const Types = () => {
         onOpen()
     }
 
-    const updateOption = () => async () => {
+    const updateOption = async () => {
         const optionToUpdate = {
             ...optionSelected,
         }
-        console.log({ optionToUpdate })
         try {
             await fetchData({
                 url: `${endponit}/${optionSelected.id}`,
@@ -72,18 +71,18 @@ const Types = () => {
                     <Table variant='simple' size={'lg'}>
                         <Thead>
                             <Tr bgColor={'gray.200'} >
-                                <Th isNumeric>ID</Th>
-                                <Th>Nombre</Th>
-                                <Th>Acciones</Th>
+                                <Th textAlign={'center'} isNumeric>ID</Th>
+                                <Th textAlign={'center'}>Nombre</Th>
+                                <Th textAlign={'center'}>Acciones</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
                             {
                                 data.map((type, i) => (
                                     <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={type?.id}>
-                                        <Td isNumeric>{type?.id}</Td>
-                                        <Td>{type?.name}</Td>
-                                        <Td ><UniIcon icon={'UilEdit'} size={10} color='primary.default' cursor={'pointer'} onClick={() => selectOption(type)} /></Td>
+                                        <Td isNumeric textAlign={'center'}>{type?.id}</Td>
+                                        <Td textAlign={'center'}>{type?.name}</Td>
+                                        <Td textAlign={'center'} ><UniIcon icon={'UilEdit'} size={10} color='primary.default' cursor={'pointer'} onClick={() => selectOption(type)} /></Td>
                                     </Tr>
                                 ))
                             }
@@ -109,7 +108,7 @@ const Types = () => {
                         <Button variant='outline' mr={3} onClick={onClose}>
                             Cerrar
                         </Button>
-                        <Button variant='solid' onClick={updateOption()}>Actualizar</Button>
+                        <Button variant='solid' onClick={updateOption}>Actualizar</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

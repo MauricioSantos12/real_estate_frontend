@@ -116,7 +116,6 @@ const Properties = () => {
     }
 
     const onUpdate = async () => {
-        console.log('viene')
         const optionToUpdate = {
             ...optionSelected,
             is_active: optionSelected.is_active == 1 ? true : false,
@@ -232,26 +231,26 @@ const Properties = () => {
                         <Table variant='simple' size={'sm'}>
                             <Thead>
                                 <Tr bgColor={'gray.200'} >
-                                    <Th >Título</Th>
-                                    <Th>Descripción</Th>
-                                    <Th>Dirección</Th>
-                                    <Th isNumeric >Habitaciones</Th>
-                                    <Th isNumeric >Baños</Th>
-                                    <Th isNumeric >Precio</Th>
-                                    <Th isNumeric >Acciones</Th>
+                                    <Th textAlign={'center'}>Título</Th>
+                                    <Th textAlign={'center'}>Descripción</Th>
+                                    <Th textAlign={'center'}>Dirección</Th>
+                                    <Th isNumeric textAlign={'center'} >Habitaciones</Th>
+                                    <Th isNumeric textAlign={'center'} >Baños</Th>
+                                    <Th isNumeric textAlign={'center'} >Precio</Th>
+                                    <Th isNumeric textAlign={'center'} >Acciones</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {
                                     data.map((property, i) => (
                                         <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={property?.id}>
-                                            <Td>{property?.title}</Td>
-                                            <Td>{property?.description}</Td>
-                                            <Td>{property?.address}</Td>
-                                            <Td isNumeric>{property?.bedrooms}</Td>
-                                            <Td isNumeric>{property?.bathrooms}</Td>
-                                            <Td isNumeric>{property?.price}</Td>
-                                            <Td>
+                                            <Td textAlign={'center'}>{property?.title}</Td>
+                                            <Td textAlign={'center'}>{property?.description}</Td>
+                                            <Td textAlign={'center'}>{property?.address}</Td>
+                                            <Td textAlign={'center'} isNumeric>{property?.bedrooms}</Td>
+                                            <Td textAlign={'center'} isNumeric>{property?.bathrooms}</Td>
+                                            <Td textAlign={'center'} isNumeric>{property?.price}</Td>
+                                            <Td textAlign={'center'}>
                                                 <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
                                                     <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(property)} />
                                                     <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(property) }} />

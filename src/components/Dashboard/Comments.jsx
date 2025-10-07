@@ -1,23 +1,84 @@
 import React, { useEffect, useState } from 'react'
 import UseFetch from '../../utils/UseFetch';
-import { Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, } from '@chakra-ui/react';
+import { Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, Select, } from '@chakra-ui/react';
 import UniIcon from '../../utils/UniIcon';
 import Loading from '../Loading';
+import { useAuth } from '../../context/useAuth';
+import { commentSchema } from '../../schemas/comments';
+import DeleteModal from '../Modal/DeleteModal';
+
+const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, valueToUpdate, cleanOption, errorModal, onClickButtonText, properties }) => {
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} size={'xl'}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>{title}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody gap={2} display={'flex'} flexDir={'column'}>
+                    <Text>Comentario</Text>
+                    <Input value={valueToUpdate?.comment} onChange={(e) => functionToUpdate(e.target.value, 'comment')}></Input>
+                    {
+                        properties && properties.length > 0 && (
+                            <>
+                                <Text>Propiedad</Text>
+                                <Select placeholder='Selecciona una propiedad' onChange={(e) => functionToUpdate(parseInt(e.target.value), 'property_id')}>
+                                    {
+                                        properties.map((property) => (
+                                            <option key={property.id} value={property.id} selected={valueToUpdate?.property_id === property.id}>{property.title}</option>
+                                        ))
+                                    }
+                                </Select>
+                            </>
+                        )
+                    }
+                    {
+                        errorModal && <Text color={'red.500'}>{errorModal}</Text>
+                    }
+                </ModalBody>
+
+                <ModalFooter>
+                    <Button mr={3} variant={'outline'} onClick={onClick}>
+                        {onClickButtonText}
+                    </Button>
+                    <Button onClick={cleanOption}>Cancelar</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+    )
+}
 
 const Comments = () => {
     const endponit = '/comments'
+    const [optionAdded, setOptionAdded] = useState({})
     const [optionSelected, setOptionSelected] = useState({})
-    const [refeshData, setRefeshData] = useState(false)
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const showToast = useToast();
+    const [optionToDelete, setOptionToDelete] = useState(null)
     const { data, loading, error, fetchData } = UseFetch()
+    const [refeshData, setRefeshData] = useState(false)
+    const [errorModal, setErrorModal] = useState(null)
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isOpenCreate, onOpen: onOpenCreate, onClose: onCloseCreate } = useDisclosure();
+    const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
+    const [properties, setProperties] = useState([])
+    const { user } = useAuth();
+
+    const showToast = useToast();
     useEffect(() => {
+
+        fetchData({
+            url: '/properties',
+            method: 'GET',
+        }).then(response => {
+            if (response) {
+                setProperties(response)
+            }
+        });
+
         fetchData({
             url: endponit,
             method: 'GET',
         });
-    }, [fetchData, refeshData]);
 
+    }, [fetchData, refeshData]);
     const updateContent = (content, label) => {
         setOptionSelected(prevState => ({
             ...prevState,
@@ -25,16 +86,32 @@ const Comments = () => {
         }))
     }
 
+    const createContent = (content, label) => {
+        setOptionAdded(prevState => ({
+            ...prevState,
+            [label]: content
+        }))
+    }
+
+    const cleanOption = () => {
+        setOptionSelected({})
+        setOptionAdded({})
+        onClose()
+        onCloseCreate()
+        onCloseDelete()
+        setErrorModal(null)
+    }
+
     const selectOption = (property) => {
         setOptionSelected(property)
         onOpen()
     }
 
-    const updateOption = () => async () => {
+    const onUpdate = async () => {
         const optionToUpdate = {
             ...optionSelected,
             user_id: optionSelected.user.id || null,
-            is_active: optionSelected.is_active == 1 ? true : false
+            is_active: optionSelected.is_active == 1 ? true : false,
         }
         delete optionToUpdate.user
         try {
@@ -58,8 +135,68 @@ const Comments = () => {
             })
 
         }
-        onClose()
+        cleanOption()
 
+    }
+
+    const onCreate = async () => {
+        const optionToAdd = {
+            ...optionAdded,
+            is_active: true,
+            user_id: user.id || null,
+        }
+        try {
+            commentSchema.parse(optionToAdd);
+            await fetchData({
+                url: `${endponit}`,
+                method: 'POST',
+                body: optionToAdd,
+            });
+            showToast({
+                title: "Creación exitosa",
+                description: "La opción ha sido creada con exito",
+                status: "success",
+            })
+            setRefeshData(!refeshData)
+            onCloseCreate()
+        } catch (error) {
+            console.error(error)
+            const errorMessages = error.message && error.message.length > 0 ? error.message : error;
+            const parsedErrors = errorMessages ? JSON.parse(errorMessages) : null;
+            const firstError = parsedErrors && parsedErrors[0] ? `${parsedErrors[0].path[0]}: ${parsedErrors[0].message}` : null;
+            setErrorModal(firstError)
+            showToast({
+                title: "Error al crear",
+                description: "Hubo un error al crear la opción",
+                status: "error",
+            })
+
+        }
+    }
+
+    const deleteOption = async () => {
+        if (!optionToDelete) return;
+        try {
+            await fetchData({
+                url: `${endponit}/${optionToDelete.id}`,
+                method: 'DELETE',
+            });
+            showToast({
+                title: "Eliminación exitosa",
+                description: "La opción ha sido eliminada con exito",
+                status: "success",
+            })
+            setRefeshData(!refeshData)
+            cleanOption()
+        } catch (error) {
+            console.error(error)
+            showToast({
+                title: "Error al eliminar",
+                description: "Hubo un error al eliminar la opción",
+                status: "error",
+            })
+            return;
+        }
     }
 
     if (loading) return <Loading />;
@@ -68,30 +205,41 @@ const Comments = () => {
     return (
         <Stack alignItems={'center'} justifyContent={'center'} w='100%' >
             <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Comentarios</Text>
+            <Stack flexDir={'row'} w='100%' justifyContent={'flex-end'}>
+                <Button variant={'outline'} onClick={() => {
+                    onOpenCreate();
 
+                }}>Agregar Comentario</Button>
+
+            </Stack>
             {data && data.length > 0 ? (
                 <TableContainer w={'100%'}>
                     <Table variant='simple' size={'lg'}>
                         <Thead>
                             <Tr bgColor={'gray.200'} >
-                                <Th >ID</Th>
-                                <Th >Usuario</Th>
-                                <Th>Comentario</Th>
-                                <Th>Fecha</Th>
-                                <Th isNumeric >Propiedad</Th>
-                                <Th>Acciones</Th>
+                                <Th textAlign={'center'}>ID</Th>
+                                <Th textAlign={'center'}>Usuario</Th>
+                                <Th textAlign={'center'}>Comentario</Th>
+                                <Th textAlign={'center'}>Fecha</Th>
+                                <Th textAlign={'center'} isNumeric >Propiedad</Th>
+                                <Th textAlign={'center'}>Acciones</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
                             {
                                 data.map((comment, i) => (
                                     <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={comment?.id}>
-                                        <Td>{comment?.id}</Td>
-                                        <Td>{comment?.user?.name}</Td>
-                                        <Td>{comment?.comment}</Td>
-                                        <Td>{new Date(comment?.created_at).toLocaleString('es-CO')}</Td>
-                                        <Td isNumeric>{comment?.property_id}</Td>
-                                        <Td ><UniIcon icon={'UilEdit'} size={10} color='primary.default' cursor={'pointer'} onClick={() => selectOption(comment)} /></Td>
+                                        <Td textAlign={'center'}>{comment?.id}</Td>
+                                        <Td textAlign={'center'}>{comment?.user?.name}</Td>
+                                        <Td textAlign={'center'}>{comment?.comment}</Td>
+                                        <Td textAlign={'center'}>{new Date(comment?.created_at).toLocaleString('es-CO')}</Td>
+                                        <Td textAlign={'center'} isNumeric>{comment?.property_id}</Td>
+                                        <Td textAlign={'center'}>
+                                            <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
+                                                <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(comment)} />
+                                                <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(comment) }} />
+                                            </Stack>
+                                        </Td>
                                     </Tr>
                                 ))
                             }
@@ -102,25 +250,14 @@ const Comments = () => {
             ) : (
                 <Text>No properties found.</Text>
             )}
-
-            <Modal isOpen={isOpen} onClose={onClose} size={'xl'}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Editar propiedad</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Text>Comentario</Text>
-                        <Input value={optionSelected?.comment} onChange={(e) => updateContent(e.target.value, 'comment')}></Input>
-                    </ModalBody>
-
-                    <ModalFooter>
-                        <Button variant='outline' mr={3} onClick={onClose}>
-                            Cerrar
-                        </Button>
-                        <Button variant='solid' onClick={updateOption()}>Actualizar</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+            <DeleteModal isOpen={isOpenDelete} onClose={onCloseDelete} onClick={() => deleteOption(optionSelected)} nameItem={'comentario'} />
+            <ContentModal
+                isOpen={isOpenCreate} onClose={cleanOption} title={'Crear nuevo comentario'} onClick={onCreate} functionToUpdate={createContent} valueToUpdate={optionAdded} cleanOption={cleanOption} errorModal={errorModal}
+                onClickButtonText={"Crear"} properties={properties} />
+            <ContentModal
+                isOpen={isOpen} onClose={cleanOption} title={'Editar comentario'} onClick={onUpdate} functionToUpdate={updateContent} valueToUpdate={optionSelected} cleanOption={cleanOption} errorModal={errorModal}
+                onClickButtonText={"Actualizar"} properties={properties}
+            />
         </Stack>
     )
 }
