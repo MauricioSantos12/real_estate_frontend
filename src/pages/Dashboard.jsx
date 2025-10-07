@@ -6,6 +6,7 @@ import Status from '../components/Dashboard/Status'
 import Types from '../components/Dashboard/Types'
 import Users from '../components/Dashboard/Users'
 import logo from '../assets/logo.png'
+import PropertyImages from '../components/Dashboard/PropertyImages'
 
 
 const Dashboard = () => {
@@ -23,6 +24,8 @@ const Dashboard = () => {
                 return <Comments />
             case "users":
                 return <Users />
+            case "property_images":
+                return <PropertyImages />
             default:
                 return <Stack>
                     <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Welcome to the Dashboard</Text>
@@ -46,6 +49,7 @@ const Dashboard = () => {
                             <Text onClick={() => setActivePage("")} fontSize="lg" fontWeight="bold" cursor={"pointer"}>Dashboard</Text>
                             <Button onClick={() => setActivePage("users")} variant={activePage === "users" ? "solid" : "outline"}>Users</Button>
                             <Button onClick={() => setActivePage("properties")} variant={activePage === "properties" ? "solid" : "outline"}>Properties</Button>
+                            <Button onClick={() => setActivePage("property_images")} variant={activePage === "property_images" ? "solid" : "outline"}>Imágenes</Button>
                             <Button onClick={() => setActivePage("comments")} variant={activePage === "comments" ? "solid" : "outline"}>Comments</Button>
                             <Button onClick={() => setActivePage("status")} variant={activePage === "status" ? "solid" : "outline"}>Status</Button>
                             <Button onClick={() => setActivePage("types")} variant={activePage === "types" ? "solid" : "outline"}>Types</Button>
