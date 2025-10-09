@@ -216,7 +216,7 @@ const Properties = () => {
     if (error) return <Text color={'red.500'}>Error: {error}</Text>;
 
     return (
-        <Container maxW={'container.xl'} py={4}>
+        <Container maxW={'100%'} py={4}>
             <Stack alignItems={'center'} justifyContent={'center'} w='100%'>
                 <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Propiedades</Text>
                 <Stack flexDir={'row'} w='100%' justifyContent={'flex-end'}>
@@ -228,7 +228,7 @@ const Properties = () => {
                 </Stack>
                 {data && data.length > 0 ? (
                     <TableContainer w={'100%'}>
-                        <Table variant='simple' size={'sm'}>
+                        <Table variant='simple' size={'lg'}>
                             <Thead>
                                 <Tr bgColor={'gray.200'} >
                                     <Th textAlign={'center'}>Título</Th>

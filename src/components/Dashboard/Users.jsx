@@ -87,7 +87,6 @@ const Users = () => {
 
         }
         cleanOption()
-
     }
 
     const onCreate = async () => {

@@ -119,7 +119,6 @@ const PropertyImages = () => {
             is_primary: optionSelected.is_primary ? true : false,
         }
         delete optionToUpdate.user
-        console.log({ optionToUpdate })
         try {
             await fetchData({
                 url: `${endponit}/update/${optionSelected.id}`,
@@ -151,7 +150,6 @@ const PropertyImages = () => {
             user_id: user.id || null,
             is_primary: optionAdded.is_primary == 1 ? true : false,
         }
-        console.log({ optionToAdd })
         try {
             propertyImageSchema.parse(optionToAdd);
             await fetchData({
@@ -221,7 +219,7 @@ const PropertyImages = () => {
             </Stack>
             {data && data.length > 0 ? (
                 <TableContainer w={'100%'}>
-                    <Table variant='simple' size={'md'}>
+                    <Table variant='simple' size={'lg'}>
                         <Thead>
                             <Tr bgColor={'gray.200'} >
                                 <Th textAlign={'center'}>ID</Th>

@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.user ? res.user : null);
         setToken(res.token || null);
         localStorage.setItem("token", JSON.stringify(res.token));
+        localStorage.setItem("user", JSON.stringify(res.user));
         return res.token;
       }
 
@@ -49,6 +50,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser) {
+          setUser(parsedUser);
+        }
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+      }
+    }
     if (storedToken) {
       try {
         const parsedToken = JSON.parse(storedToken);

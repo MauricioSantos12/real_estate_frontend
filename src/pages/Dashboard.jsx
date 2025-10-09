@@ -1,17 +1,37 @@
 import { Container, Grid, GridItem, VStack, Link, Text, Stack, Button, Image } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Properties from '../components/Dashboard/Properties'
 import Comments from '../components/Dashboard/Comments'
 import Status from '../components/Dashboard/Status'
 import Types from '../components/Dashboard/Types'
 import Users from '../components/Dashboard/Users'
-import logo from '../assets/logo.png'
 import PropertyImages from '../components/Dashboard/PropertyImages'
+import UseFetch from '../utils/UseFetch'
+import Loading from '../components/Loading'
+import PrincipalView from '../components/Dashboard/PrincipalView'
 
 
 const Dashboard = () => {
-
     const [activePage, setActivePage] = useState("")
+    const { data: dataProperties, loading: loadingProperties, error: errorProperties, fetchData: fetchDataProperties } = UseFetch()
+    const { data: dataUsers, loading: loadingUsers, error: errorUsers, fetchData: fetchDataUsers } = UseFetch()
+    const { data: dataComments, loading: loadingComments, error: errorComments, fetchData: fetchDataComments } = UseFetch()
+
+    useEffect(() => {
+        fetchDataProperties({
+            url: '/properties',
+            method: 'GET',
+        });
+        fetchDataUsers({
+            url: '/users',
+            method: 'GET',
+        });
+        fetchDataComments({
+            url: '/comments',
+            method: 'GET',
+        });
+    }, [fetchDataProperties, fetchDataUsers, fetchDataComments]);
+
     const renderContent = () => {
         switch (activePage) {
             case "properties":
@@ -27,26 +47,22 @@ const Dashboard = () => {
             case "property_images":
                 return <PropertyImages />
             default:
-                return <Stack>
-                    <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Welcome to the Dashboard</Text>
-                    <Text fontSize={'lg'} w={'100%'} textAlign={'center'}>Select an option from the menu</Text>
-                    <Image src={logo} alt="logo" width='auto' height={'auto'} maxH={'300px'} />
-                </Stack>
+                return <PrincipalView properties={dataProperties} users={dataUsers} comments={dataComments} />
         }
     }
+
+    if (loadingProperties || loadingUsers || loadingComments) return <Loading />;
+    if (errorProperties || errorUsers || errorComments) return <Text color={'red.500'}>Error: {errorProperties || errorUsers || errorComments}</Text>;
+
+
     return (
         <Stack align="center" justifyContent={'center'} h="auto" w="100%" bgColor={"gray.50"}>
-            <Container maxW="container.xl" w="100%" h="100vh" p={0} m="0 auto">
-                <Grid
-                    templateAreas={`"nav main"`}
-                    gridTemplateColumns={'200px 1fr'}
-                    h="100vh"
-                    gap="1"
-                >
+            <Stack w="100%" h="100vh" p={0} m="0 auto">
+                <Stack direction="row" h={{ base: 'auto', md: '100vh' }} gap={5} display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start">
                     {/* Sidebar */}
-                    <GridItem bg="gray.100" area={'nav'} p={4}>
+                    <Stack bg="gray.100" p={4} w={{ base: '100%', md: '200px' }} >
                         <VStack align="stretch" spacing={4}>
-                            <Text onClick={() => setActivePage("")} fontSize="lg" fontWeight="bold" cursor={"pointer"}>Dashboard</Text>
+                            <Text onClick={() => setActivePage("")} fontSize="lg" fontWeight="bold" cursor="pointer">Dashboard</Text>
                             <Button onClick={() => setActivePage("users")} variant={activePage === "users" ? "solid" : "outline"}>Users</Button>
                             <Button onClick={() => setActivePage("properties")} variant={activePage === "properties" ? "solid" : "outline"}>Properties</Button>
                             <Button onClick={() => setActivePage("property_images")} variant={activePage === "property_images" ? "solid" : "outline"}>Imágenes</Button>
@@ -54,14 +70,14 @@ const Dashboard = () => {
                             <Button onClick={() => setActivePage("status")} variant={activePage === "status" ? "solid" : "outline"}>Status</Button>
                             <Button onClick={() => setActivePage("types")} variant={activePage === "types" ? "solid" : "outline"}>Types</Button>
                         </VStack>
-                    </GridItem>
+                    </Stack>
 
                     {/* Main */}
-                    <GridItem bg="gray.100" w='100%' area={'main'} p={6} display={'flex'} justifyContent={'center'} alignItems={!activePage ? 'center' : 'flex-start'} >
+                    <Stack bg="gray.100" p={6} display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start" w={{ base: '100%', md: 'calc(100% - 220px)' }}  >
                         {renderContent()}
-                    </GridItem>
-                </Grid>
-            </Container>
+                    </Stack>
+                </Stack>
+            </Stack>
         </Stack>
     )
 }
