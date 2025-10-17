@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
 import Home from "../pages/Home";
-import Properties from "../pages/Properties";
 import PropertyDetail from "../pages/PropertyDetail";
 import PrivateRoute from "./PrivateRoute";
 import Login from "../pages/Login";
@@ -26,15 +25,7 @@ function AppRouter() {
                 }
             />
             <Route
-                path="/properties"
-                element={
-                    <Layout>
-                        <Properties />
-                    </Layout>
-                }
-            />
-            <Route
-                path="/properties/:id"
+                path="/property/:id"
                 element={
                     <Layout>
                         <PropertyDetail />

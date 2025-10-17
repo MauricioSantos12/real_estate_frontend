@@ -85,6 +85,7 @@ const PropertyImages = () => {
         });
 
     }, [fetchData, refeshData]);
+
     const updateContent = (content, label) => {
         setOptionSelected(prevState => ({
             ...prevState,
@@ -223,9 +224,9 @@ const PropertyImages = () => {
                         <Thead>
                             <Tr bgColor={'gray.200'} >
                                 <Th textAlign={'center'}>ID</Th>
+                                <Th textAlign={'center'}>Caption</Th>
                                 <Th textAlign={'center'}>Imagen</Th>
                                 <Th textAlign={'center'}>Imagen primaria</Th>
-                                <Th textAlign={'center'}>Caption</Th>
                                 <Th textAlign={'center'} isNumeric >Propiedad</Th>
                                 <Th textAlign={'center'}>Acciones</Th>
                             </Tr>
@@ -235,6 +236,7 @@ const PropertyImages = () => {
                                 data.map((image, i) => (
                                     <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={image?.id}>
                                         <Td textAlign={'center'}>{image?.id}</Td>
+                                        <Td textAlign={'center'} isNumeric>{image?.caption}</Td>
                                         <Td textAlign={'center'} >
                                             {image?.image_url?.length > 50 ? (
                                                 <Text>
@@ -245,7 +247,6 @@ const PropertyImages = () => {
                                             )}
                                         </Td>
                                         <Td textAlign={'center'}> {image?.is_primary ? 'Si' : 'No'} </Td>
-                                        <Td textAlign={'center'} isNumeric>{image?.caption}</Td>
                                         <Td textAlign={'center'} isNumeric>{image?.property_id}</Td>
                                         <Td textAlign={'center'}>
                                             <Stack flexDir={'row'} spacing={2} alignItems={'center'}>

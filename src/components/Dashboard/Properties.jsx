@@ -79,7 +79,6 @@ const Properties = () => {
     const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
     const showToast = useToast();
     const { user } = useAuth();
-
     useEffect(() => {
         fetchData({
             url: endponit,
@@ -245,7 +244,17 @@ const Properties = () => {
                                     data.map((property, i) => (
                                         <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={property?.id}>
                                             <Td textAlign={'center'}>{property?.title}</Td>
-                                            <Td textAlign={'center'}>{property?.description}</Td>
+                                            <Td textAlign={'center'}>
+
+                                                {property?.description?.length > 50 ? (
+                                                    <Text>
+                                                        {property?.description?.slice(0, 50)}...
+                                                    </Text>
+                                                ) : (
+                                                    <Text>{property?.description}</Text>
+                                                )}
+                                            </Td>
+
                                             <Td textAlign={'center'}>{property?.address}</Td>
                                             <Td textAlign={'center'} isNumeric>{property?.bedrooms}</Td>
                                             <Td textAlign={'center'} isNumeric>{property?.bathrooms}</Td>
