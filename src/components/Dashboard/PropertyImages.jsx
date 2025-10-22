@@ -139,7 +139,6 @@ const PropertyImages = () => {
                 description: "Hubo un error al editar la opción",
                 status: "error",
             })
-
         }
         cleanOption()
 
@@ -164,7 +163,6 @@ const PropertyImages = () => {
                 status: "success",
             })
             setRefeshData(!refeshData)
-            onCloseCreate()
         } catch (error) {
             console.error(error)
             const errorMessages = error.message && error.message.length > 0 ? error.message : error;
@@ -178,6 +176,7 @@ const PropertyImages = () => {
             })
 
         }
+        cleanOption()
     }
 
     const deleteOption = async () => {

@@ -57,8 +57,8 @@ const Dashboard = () => {
 
     return (
         <Stack align="center" justifyContent={'center'} h="auto" w="100%" bgColor={"gray.50"}>
-            <Stack w="100%" h="100vh" p={0} m="0 auto">
-                <Stack direction="row" h={{ base: 'auto', md: '100vh' }} gap={5} display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start">
+            <Stack w="100%" h="100%" p={0} m="0 auto">
+                <Stack direction="row" h={{ base: 'auto', md: '100%' }} gap={5} display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start">
                     {/* Sidebar */}
                     <Stack bg="gray.100" p={4} w={{ base: '100%', md: '200px' }} >
                         <VStack align="stretch" spacing={4}>
@@ -73,7 +73,7 @@ const Dashboard = () => {
                     </Stack>
 
                     {/* Main */}
-                    <Stack bg="gray.100" p={6} display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start" w={{ base: '100%', md: 'calc(100% - 220px)' }}  >
+                    <Stack bg="gray.100" p={6} display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start" w={{ base: '100%', md: 'calc(100% - 220px)' }} h={{ base: 'auto', md: '100%' }} >
                         {renderContent()}
                     </Stack>
                 </Stack>
