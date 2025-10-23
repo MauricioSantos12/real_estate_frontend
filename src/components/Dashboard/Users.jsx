@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import UseFetch from '../../utils/UseFetch';
-import { Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useToast, useDisclosure, Input, Button, Switch, Select, } from '@chakra-ui/react';
+import { Stack, Text, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useToast, useDisclosure, Input, Button, Switch, Select, } from '@chakra-ui/react';
 import UniIcon from '../../utils/UniIcon';
 import Loading from '../Loading';
 import { userSchema } from '../../schemas/user';
 import DeleteModal from '../Modal/DeleteModal';
+import DataTable from 'react-data-table-component';
 
 const Users = () => {
     const [optionAdded, setOptionAdded] = useState({})
@@ -65,7 +66,7 @@ const Users = () => {
                 method: 'PUT',
                 body: optionToUpdate,
             });
-            if (res) {
+            if (res?.status === 200) {
                 showToast({
                     title: "Edición exitosa",
                     description: "La opción ha sido editada con exito",
@@ -74,19 +75,22 @@ const Users = () => {
                 setRefeshData(!refeshData)
             } else {
                 console.log({ res })
+                showToast({
+                    title: "Error al editar",
+                    description: "Hubo un error al editar la opción",
+                    status: "error",
+                })
             }
 
         } catch (error) {
             console.error(error)
-            // setErrors(error?.message)
             showToast({
                 title: "Error al editar",
                 description: "Hubo un error al editar la opción",
                 status: "error",
             })
-
         }
-        cleanOption()
+        cleanOption();
     }
 
     const onCreate = async () => {
@@ -148,11 +152,52 @@ const Users = () => {
         }
     }
 
+    const columns = [
+        {
+            name: 'ID',
+            selector: row => row.id,
+            sortable: true,
+        },
+        {
+            name: 'Nombre',
+            selector: row => row.name,
+            sortable: true,
+        },
+        {
+            name: 'Email',
+            selector: row => row.email,
+        },
+        {
+            name: 'Rol',
+            selector: row => row.role.toUpperCase(),
+            sortable: true,
+        },
+        {
+            name: 'Activo',
+            selector: row => row.is_active ? 'Sí' : 'No',
+            sortable: true,
+        },
+        {
+            name: 'Anónimo',
+            selector: row => row.is_anonymous == 1 ? 'Sí' : 'No',
+            sortable: true,
+        },
+        {
+            name: 'Acciones',
+            cell: row => (
+                <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
+                    <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(row)} />
+                    <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(row) }} />
+                </Stack>
+            )
+        },
+    ];
+
     if (loading) return <Loading />;
     if (error) return <Text color={'red.500'}>Error: {error}</Text>;
     return (
         <Stack alignItems={'center'} justifyContent={'center'} w='100%' >
-            <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Usuarios</Text>
+            <Text fontSize={{ base: 'lg', md: '3xl' }} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Usuarios</Text>
             <Stack flexDir={'row'} w='100%' justifyContent={'flex-end'}>
                 <Button variant={'outline'} onClick={() => {
                     onOpenCreate();
@@ -162,42 +207,13 @@ const Users = () => {
             </Stack>
 
             {data && data.length > 0 ? (
-                <TableContainer w={'100%'}>
-                    <Table variant='simple' size={'lg'}>
-                        <Thead>
-                            <Tr bgColor={'gray.200'} >
-                                <Th textAlign={'center'} isNumeric>ID</Th>
-                                <Th textAlign={'center'}>Nombre</Th>
-                                <Th textAlign={'center'}>Email</Th>
-                                <Th textAlign={'center'}>Rol</Th>
-                                <Th textAlign={'center'}>Activo</Th>
-                                <Th textAlign={'center'}>Anónimo</Th>
-                                <Th textAlign={'center'}>Acciones</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {
-                                data.map((user, i) => (
-                                    <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={user?.id}>
-                                        <Td textAlign={'center'} isNumeric>{user?.id}</Td>
-                                        <Td textAlign={'center'}>{user?.name}</Td>
-                                        <Td textAlign={'center'}>{user?.email}</Td>
-                                        <Td textAlign={'center'}>{user?.role.toUpperCase()}</Td>
-                                        <Td textAlign={'center'}>{user?.is_active == 1 ? 'Sí' : 'No'}</Td>
-                                        <Td textAlign={'center'}>{user?.is_anonymous == 1 ? 'Sí' : 'No'}</Td>
-                                        <Td textAlign={'center'}>
-                                            <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
-                                                <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(user)} />
-                                                <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(user) }} />
-                                            </Stack>
-                                        </Td>
-                                    </Tr>
-                                ))
-                            }
-                        </Tbody>
-
-                    </Table>
-                </TableContainer>
+                <>
+                    <DataTable
+                        columns={columns}
+                        data={data}
+                        pagination
+                    />
+                </>
             ) : (
                 <Text>No properties found.</Text>
             )}
@@ -235,10 +251,10 @@ const Users = () => {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button mr={3} variant={'outline'} onClick={onCreate}>
+                        <Button mr={3} onClick={onCreate}>
                             Guardar
                         </Button>
-                        <Button onClick={cleanOption}>Cancelar</Button>
+                        <Button variant={'outline'} onClick={cleanOption}>Cancelar</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import UseFetch from '../../utils/UseFetch';
-import { Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, useToast, } from '@chakra-ui/react';
+import { Stack, useDisclosure, Modal, ModalBody, Text, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, useToast, } from '@chakra-ui/react';
 import UniIcon from '../../utils/UniIcon';
 import Loading from '../Loading';
+import DataTable from 'react-data-table-component';
 
 const Types = () => {
     const endponit = '/properties/types'
@@ -59,37 +60,40 @@ const Types = () => {
 
     }
 
+    const columns = [
+        {
+            name: 'ID',
+            selector: row => row.id,
+            sortable: true,
+        },
+        {
+            name: 'Nombre',
+            selector: row => row.name,
+            sortable: true,
+        },
+        {
+            name: 'Acciones',
+            cell: row => (
+                <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
+                    <UniIcon icon={'UilEdit'} size={10} color='primary.default' cursor={'pointer'} onClick={() => selectOption(row)} />
+                </Stack>
+            )
+        },
+    ];
+
     if (loading) return <Loading />;
     if (error) return <p>Error: {error}</p>;
 
     return (
         <Stack alignItems={'center'} justifyContent={'center'} w='100%' >
-            <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Tipos</Text>
+            <Text fontSize={{ base: 'lg', md: '3xl' }} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Tipos</Text>
 
             {data && data.length > 0 ? (
-                <TableContainer w={'100%'}>
-                    <Table variant='simple' size={'lg'}>
-                        <Thead>
-                            <Tr bgColor={'gray.200'} >
-                                <Th textAlign={'center'} isNumeric>ID</Th>
-                                <Th textAlign={'center'}>Nombre</Th>
-                                <Th textAlign={'center'}>Acciones</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {
-                                data.map((type, i) => (
-                                    <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={type?.id}>
-                                        <Td isNumeric textAlign={'center'}>{type?.id}</Td>
-                                        <Td textAlign={'center'}>{type?.name}</Td>
-                                        <Td textAlign={'center'} ><UniIcon icon={'UilEdit'} size={10} color='primary.default' cursor={'pointer'} onClick={() => selectOption(type)} /></Td>
-                                    </Tr>
-                                ))
-                            }
-                        </Tbody>
-
-                    </Table>
-                </TableContainer>
+                <DataTable
+                    columns={columns}
+                    data={data}
+                    pagination
+                />
             ) : (
                 <Text>No properties found.</Text>
             )}

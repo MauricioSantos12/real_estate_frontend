@@ -7,6 +7,7 @@ import DeleteModal from '../Modal/DeleteModal';
 import { propertySchema } from '../../schemas/properties';
 import { useAuth } from '../../context/useAuth';
 import SelectIcon from '../SelectIcon';
+import DataTable from 'react-data-table-component';
 
 const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, valueToUpdate, cleanOption, errorModal, onClickButtonText }) => {
     return (
@@ -56,10 +57,10 @@ const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, value
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button mr={3} variant={'outline'} onClick={onClick}>
+                    <Button mr={3} onClick={onClick}>
                         {onClickButtonText}
                     </Button>
-                    <Button onClick={cleanOption}>Cancelar</Button>
+                    <Button variant={'outline'} onClick={cleanOption}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -211,13 +212,67 @@ const Properties = () => {
         }
     }
 
+    const columns = [
+        {
+            name: 'ID',
+            selector: row => row.id,
+            sortable: true,
+        },
+        {
+            name: 'Título',
+            selector: row => row.title,
+            sortable: true,
+        },
+        {
+            name: 'Descripción',
+            selector: row => row.description?.length > 50 ? (
+                <Text>
+                    {row?.description?.slice(0, 50)}...
+                </Text>
+            ) : (
+                <Text>{row?.description}</Text>
+            ),
+            sortable: true,
+        },
+        {
+            name: 'Dirección',
+            selector: row => row.address,
+            sortable: true,
+        },
+        {
+            name: 'Habitaciones',
+            selector: row => row.bedrooms,
+            sortable: true,
+        },
+        {
+            name: 'Baños',
+            selector: row => row.bathrooms,
+            sortable: true,
+        },
+        {
+            name: 'Precio',
+            selector: row => row.price,
+            sortable: true,
+        },
+
+        {
+            name: 'Acciones',
+            cell: row => (
+                <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
+                    <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(row)} />
+                    <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(row) }} />
+                </Stack>
+            )
+        },
+    ];
+
     if (loading) return <Loading />;
     if (error) return <Text color={'red.500'}>Error: {error}</Text>;
 
     return (
         <Container maxW={'100%'} py={4}>
             <Stack alignItems={'center'} justifyContent={'center'} w='100%'>
-                <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Propiedades</Text>
+                <Text fontSize={{ base: 'lg', md: '3xl' }} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Propiedades</Text>
                 <Stack flexDir={'row'} w='100%' justifyContent={'flex-end'}>
                     <Button variant={'outline'} onClick={() => {
                         onOpenCreate();
@@ -226,52 +281,11 @@ const Properties = () => {
 
                 </Stack>
                 {data && data.length > 0 ? (
-                    <TableContainer w={'100%'}>
-                        <Table variant='simple' size={'lg'}>
-                            <Thead>
-                                <Tr bgColor={'gray.200'} >
-                                    <Th textAlign={'center'}>Título</Th>
-                                    <Th textAlign={'center'}>Descripción</Th>
-                                    <Th textAlign={'center'}>Dirección</Th>
-                                    <Th isNumeric textAlign={'center'} >Habitaciones</Th>
-                                    <Th isNumeric textAlign={'center'} >Baños</Th>
-                                    <Th isNumeric textAlign={'center'} >Precio</Th>
-                                    <Th isNumeric textAlign={'center'} >Acciones</Th>
-                                </Tr>
-                            </Thead>
-                            <Tbody>
-                                {
-                                    data.map((property, i) => (
-                                        <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={property?.id}>
-                                            <Td textAlign={'center'}>{property?.title}</Td>
-                                            <Td textAlign={'center'}>
-
-                                                {property?.description?.length > 50 ? (
-                                                    <Text>
-                                                        {property?.description?.slice(0, 50)}...
-                                                    </Text>
-                                                ) : (
-                                                    <Text>{property?.description}</Text>
-                                                )}
-                                            </Td>
-
-                                            <Td textAlign={'center'}>{property?.address}</Td>
-                                            <Td textAlign={'center'} isNumeric>{property?.bedrooms}</Td>
-                                            <Td textAlign={'center'} isNumeric>{property?.bathrooms}</Td>
-                                            <Td textAlign={'center'} isNumeric>{property?.price}</Td>
-                                            <Td textAlign={'center'}>
-                                                <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
-                                                    <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(property)} />
-                                                    <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(property) }} />
-                                                </Stack>
-                                            </Td>
-                                        </Tr>
-                                    ))
-                                }
-                            </Tbody>
-
-                        </Table>
-                    </TableContainer>
+                    <DataTable
+                        columns={columns}
+                        data={data}
+                        pagination
+                    />
                 ) : (
                     <Text>No properties found.</Text>
                 )}

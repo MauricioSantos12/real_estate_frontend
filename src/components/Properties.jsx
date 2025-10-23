@@ -75,7 +75,7 @@ const Properties = () => {
     if (loading) return <Loading />;
     if (error) return <Text color={'red.500'}>Error: {error}</Text>;
     return (
-        <Stack w={'100%'} justifyContent={'space-between'} flexDir={'row'} alignItems={'center'} gap={6} bgColor={'white'} py={16} px={8}>
+        <Stack w={'100%'} justifyContent={'space-between'} flexDir={'row'} alignItems={'center'} gap={6} bgColor={'white'} py={16} px={8} id='properties'>
             <Container maxW={'container.xl'} w={'100%'} h={'100%'} display={'flex'} flexDir={'column'} gap={6}>
                 <Stack flexDir={{ base: 'column', md: 'row' }} justifyContent={'space-between'} alignItems={'flex-start'} gap={6} >
                     <Stack gap={4}>
@@ -83,7 +83,7 @@ const Properties = () => {
                         <Text fontSize={'xl'} w={'100%'} textAlign={'left'} color={'text.light'}>{sortedData?.length} propiedades encontradas</Text>
                     </Stack>
                     <Select placeholder='Selecionar una opción' w={'fit-content'} onChange={handleFilter}>
-                        <option value='featured'>Destacadas</option>
+                        {/* <option value='featured'>Destacadas</option> */}
                         <option value='lessValue'>Menor valor</option>
                         <option value='moreValue'>Mayor valor</option>
                     </Select>

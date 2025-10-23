@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import UseFetch from '../../utils/UseFetch';
-import { Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, Select, } from '@chakra-ui/react';
+import { Stack, Text, useDisclosure, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, Select, } from '@chakra-ui/react';
 import UniIcon from '../../utils/UniIcon';
 import Loading from '../Loading';
 import { useAuth } from '../../context/useAuth';
 import { commentSchema } from '../../schemas/comments';
 import DeleteModal from '../Modal/DeleteModal';
+import DataTable from 'react-data-table-component';
 
 const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, valueToUpdate, cleanOption, errorModal, onClickButtonText, properties }) => {
     return (
@@ -37,10 +38,10 @@ const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, value
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button mr={3} variant={'outline'} onClick={onClick}>
+                    <Button mr={3} onClick={onClick}>
                         {onClickButtonText}
                     </Button>
-                    <Button onClick={cleanOption}>Cancelar</Button>
+                    <Button variant={'outline'} onClick={cleanOption}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -199,12 +200,48 @@ const Comments = () => {
         }
     }
 
+    const columns = [
+        {
+            name: 'ID',
+            selector: row => row.id,
+            sortable: true,
+        },
+        {
+            name: 'Usuario',
+            selector: row => row.user?.name,
+            sortable: true,
+        },
+        {
+            name: 'Comentario',
+            selector: row => row.comment,
+        },
+        {
+            name: 'Fecha',
+            selector: row => new Date(row?.created_at).toLocaleString('es-CO'),
+            sortable: true,
+        },
+        {
+            name: 'Propiedad',
+            selector: row => row.property_id,
+            sortable: true,
+        },
+        {
+            name: 'Acciones',
+            cell: row => (
+                <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
+                    <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(row)} />
+                    <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(row) }} />
+                </Stack>
+            )
+        },
+    ];
+
     if (loading) return <Loading />;
     if (error) return <p>Error: {error}</p>;
 
     return (
         <Stack alignItems={'center'} justifyContent={'center'} w='100%' >
-            <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Comentarios</Text>
+            <Text fontSize={{ base: 'lg', md: '3xl' }} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Comentarios</Text>
             <Stack flexDir={'row'} w='100%' justifyContent={'flex-end'}>
                 <Button variant={'outline'} onClick={() => {
                     onOpenCreate();
@@ -213,40 +250,11 @@ const Comments = () => {
 
             </Stack>
             {data && data.length > 0 ? (
-                <TableContainer w={'100%'}>
-                    <Table variant='simple' size={'lg'}>
-                        <Thead>
-                            <Tr bgColor={'gray.200'} >
-                                <Th textAlign={'center'}>ID</Th>
-                                <Th textAlign={'center'}>Usuario</Th>
-                                <Th textAlign={'center'}>Comentario</Th>
-                                <Th textAlign={'center'}>Fecha</Th>
-                                <Th textAlign={'center'} isNumeric >Propiedad</Th>
-                                <Th textAlign={'center'}>Acciones</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {
-                                data.map((comment, i) => (
-                                    <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={comment?.id}>
-                                        <Td textAlign={'center'}>{comment?.id}</Td>
-                                        <Td textAlign={'center'}>{comment?.user?.name}</Td>
-                                        <Td textAlign={'center'}>{comment?.comment}</Td>
-                                        <Td textAlign={'center'}>{new Date(comment?.created_at).toLocaleString('es-CO')}</Td>
-                                        <Td textAlign={'center'} isNumeric>{comment?.property_id}</Td>
-                                        <Td textAlign={'center'}>
-                                            <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
-                                                <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(comment)} />
-                                                <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(comment) }} />
-                                            </Stack>
-                                        </Td>
-                                    </Tr>
-                                ))
-                            }
-                        </Tbody>
-
-                    </Table>
-                </TableContainer>
+                <DataTable
+                    columns={columns}
+                    data={data}
+                    pagination
+                />
             ) : (
                 <Text>No properties found.</Text>
             )}

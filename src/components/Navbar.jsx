@@ -10,14 +10,6 @@ function Navbar() {
             path: "/"
         },
         {
-            name: "Properties",
-            path: "/properties"
-        },
-        {
-            name: "Login",
-            path: "/login"
-        },
-        {
             name: "Dashboard",
             path: "/dashboard"
         }
@@ -27,7 +19,9 @@ function Navbar() {
             <Container w={'100%'} maxW={'container.xl'}>
                 <Stack display={'flex'} flexDir={'row'} width={'100%'} justifyContent={'space-between'} alignItems={'center'} >
                     <Stack display={{ base: 'none', md: 'flex' }} justifyContent={'space-between'} alignItems={'center'}>
-                        <Image src={logo} alt="logo" width='auto' height={'auto'} maxH={'50px'} />
+                        <Link href={'/'}>
+                            <Image src={logo} alt="logo" width='auto' height={'auto'} maxH={'50px'} />
+                        </Link>
                     </Stack>
                     <Stack display={{ base: 'none', md: 'flex' }} flexDir={'row'} justifyContent={'space-between'} alignItems={'center'} gap={6}>
                         {

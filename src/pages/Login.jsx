@@ -33,11 +33,12 @@ const Login = () => {
 
     return (
         <Stack
-            h="calc(100vh - 268px)"
+            h="auto"
             w="100%"
             alignItems={"center"}
             justifyContent={"center"}
             bgColor={"gray.100"}
+            p={8}
         >
             <Container
                 w={"100%"}
@@ -48,8 +49,8 @@ const Login = () => {
                 justifyContent={"center"}
             >
                 <Stack
-                    p={8}
-                    gap={6}
+                    p={{ base: 2, md: 8 }}
+                    gap={{ base: 2, md: 4 }}
                     w={"100%"}
                     h={"auto"}
                     alignItems={"center"}
@@ -59,10 +60,10 @@ const Login = () => {
                     boxShadow={"xl"}
                     maxW={"700px"}
                 >
-                    <Heading fontSize={"3xl"} fontWeight={700}>
+                    <Heading fontSize={{ base: "lg", md: "3xl" }} fontWeight={700}>
                         Real Estate
                     </Heading>
-                    <Heading fontSize={"2xl"} fontWeight={500}>
+                    <Heading fontSize={{ base: "md", md: "2xl" }} fontWeight={500}>
                         Iniciar Sesión
                     </Heading>
                     <Input

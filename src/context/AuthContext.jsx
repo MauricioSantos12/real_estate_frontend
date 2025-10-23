@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     showToast({
       title: "Logout Successful",
       description: "You have been logged out.",

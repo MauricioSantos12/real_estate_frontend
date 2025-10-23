@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import UseFetch from '../../utils/UseFetch';
-import { Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, Select, Switch, } from '@chakra-ui/react';
+import { Stack, Text, useDisclosure, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Input, Button, Select, Switch, } from '@chakra-ui/react';
 import UniIcon from '../../utils/UniIcon';
 import Loading from '../Loading';
 import { useAuth } from '../../context/useAuth';
 import DeleteModal from '../Modal/DeleteModal';
 import { propertyImageSchema } from '../../schemas/property_images';
+import DataTable from 'react-data-table-component';
 
 const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, valueToUpdate, cleanOption, errorModal, onClickButtonText, properties }) => {
     return (
@@ -43,10 +44,10 @@ const ContentModal = ({ isOpen, onClose, title, onClick, functionToUpdate, value
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button mr={3} variant={'outline'} onClick={onClick}>
+                    <Button mr={3} onClick={onClick}>
                         {onClickButtonText}
                     </Button>
-                    <Button onClick={cleanOption}>Cancelar</Button>
+                    <Button variant={'outline'} onClick={cleanOption}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -179,6 +180,48 @@ const PropertyImages = () => {
         cleanOption()
     }
 
+    const columns = [
+        {
+            name: 'ID',
+            selector: row => row.id,
+            sortable: true,
+        },
+        {
+            name: 'Caption',
+            selector: row => row.caption,
+            sortable: true,
+        },
+        {
+            name: 'Imagen',
+            selector: row => row?.image_url?.length > 50 ? (
+                <Text>
+                    {row?.image_url?.slice(0, 50)}...
+                </Text>
+            ) : (
+                <Text>{row?.image_url}</Text>
+            ),
+        },
+        {
+            name: 'Imagen primaria',
+            selector: row => row?.is_primary ? 'Si' : 'No',
+            sortable: true,
+        },
+        {
+            name: 'Propiedad',
+            selector: row => row.property_id,
+            sortable: true,
+        },
+        {
+            name: 'Acciones',
+            cell: row => (
+                <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
+                    <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(row)} />
+                    <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(row) }} />
+                </Stack>
+            )
+        },
+    ];
+
     const deleteOption = async () => {
         if (!optionToDelete) return;
         try {
@@ -209,7 +252,7 @@ const PropertyImages = () => {
 
     return (
         <Stack alignItems={'center'} justifyContent={'center'} w='100%' >
-            <Text fontSize={'3xl'} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Imágenes</Text>
+            <Text fontSize={{ base: 'lg', md: '3xl' }} w={'100%'} textAlign={'center'} fontWeight={'bold'}>Imágenes</Text>
             <Stack flexDir={'row'} w='100%' justifyContent={'flex-end'}>
                 <Button variant={'outline'} onClick={() => {
                     onOpenCreate();
@@ -218,48 +261,11 @@ const PropertyImages = () => {
 
             </Stack>
             {data && data.length > 0 ? (
-                <TableContainer w={'100%'}>
-                    <Table variant='simple' size={'lg'}>
-                        <Thead>
-                            <Tr bgColor={'gray.200'} >
-                                <Th textAlign={'center'}>ID</Th>
-                                <Th textAlign={'center'}>Caption</Th>
-                                <Th textAlign={'center'}>Imagen</Th>
-                                <Th textAlign={'center'}>Imagen primaria</Th>
-                                <Th textAlign={'center'} isNumeric >Propiedad</Th>
-                                <Th textAlign={'center'}>Acciones</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {
-                                data.map((image, i) => (
-                                    <Tr bgColor={i % 2 === 0 ? 'gray.100' : 'white'} key={image?.id}>
-                                        <Td textAlign={'center'}>{image?.id}</Td>
-                                        <Td textAlign={'center'} isNumeric>{image?.caption}</Td>
-                                        <Td textAlign={'center'} >
-                                            {image?.image_url?.length > 50 ? (
-                                                <Text>
-                                                    {image?.image_url?.slice(0, 50)}...
-                                                </Text>
-                                            ) : (
-                                                <Text>{image?.image_url}</Text>
-                                            )}
-                                        </Td>
-                                        <Td textAlign={'center'}> {image?.is_primary ? 'Si' : 'No'} </Td>
-                                        <Td textAlign={'center'} isNumeric>{image?.property_id}</Td>
-                                        <Td textAlign={'center'}>
-                                            <Stack flexDir={'row'} spacing={2} alignItems={'center'}>
-                                                <UniIcon icon={'UilEdit'} size={5} color='primary.default' cursor={'pointer'} onClick={() => selectOption(image)} />
-                                                <UniIcon icon={'UilTrash'} size={5} color='red' cursor={'pointer'} onClick={() => { onOpenDelete(); setOptionToDelete(image) }} />
-                                            </Stack>
-                                        </Td>
-                                    </Tr>
-                                ))
-                            }
-                        </Tbody>
-
-                    </Table>
-                </TableContainer>
+                <DataTable
+                    columns={columns}
+                    data={data}
+                    pagination
+                />
             ) : (
                 <Text>No images found.</Text>
             )}
